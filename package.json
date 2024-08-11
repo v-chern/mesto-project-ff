@@ -4,7 +4,6 @@
   "description": "Ссылка на репозиторий: https://github.com/v-chern/mesto-project-ff",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode production",
     "dev": "webpack serve"
   },

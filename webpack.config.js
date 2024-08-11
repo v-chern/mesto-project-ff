@@ -8,7 +8,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: { 
-        main: './src/index.js'                  // Entry point - файл, с которого начинается сборка
+        main: './src/scripts/index.js'                  // Entry point - файл, с которого начинается сборка
     },  
     output: {
         path: path.resolve(__dirname, 'dist'),  // Путь к финальной директории
@@ -32,7 +32,6 @@ module.exports = {
                 exclude: '/node_modules/'
             },
             {
-                // регулярное выражение, которое ищет все файлы с такими расширениями
                 test: /\.(png|svg|jpg|gif|woff(2)?|eot|ttf|otf)$/,
                 type: 'asset/resource'
             },
