@@ -97,6 +97,7 @@ addCardButton.addEventListener('click', () => {
     openModal(addCardPopup);
 })
 
+//@todo: обработчик события нажатия клавиши Esc добавляется на document при открытии модального окна и удаляется при закрытии.
 document.addEventListener('keydown', (evt) => {
     if (evt.key === 'Escape') {
         closeModal();
