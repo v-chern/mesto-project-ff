@@ -25,4 +25,5 @@ const initialCards = [
     }
 ];
 
+
 export {initialCards};
