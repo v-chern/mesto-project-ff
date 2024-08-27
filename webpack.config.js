@@ -8,7 +8,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: { 
-        main: './src/scripts/index.js'                  // Entry point - файл, с которого начинается сборка
+        main: './src/scripts/index.js'           // Entry point - файл, с которого начинается сборка
     },  
     output: {
         path: path.resolve(__dirname, 'dist'),  // Путь к финальной директории
