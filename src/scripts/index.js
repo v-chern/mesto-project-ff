@@ -26,10 +26,15 @@ const addCardForm = addCardPopup.querySelector('.popup__form');
 const cardNameInput = addCardForm.querySelector('.popup__input_type_card-name');
 const cardLinkInput = addCardForm.querySelector('.popup__input_type_url');
 
+//img popup
+const showImgPopup = document.querySelector('.popup_type_image');
+const popupImgElem = showImgPopup.querySelector('.popup__image');
+
+//popups collection
+const popups = document.querySelectorAll('.popup');
+
 // Обработка клика по изображению
 function showImage(cardData) {
-    const showImgPopup = document.querySelector('.popup_type_image');
-    const popupImgElem = showImgPopup.querySelector('.popup__image');
     popupImgElem.src = cardData.link;
     popupImgElem.alt = 'Детальное изображение места' + cardData.name;
     showImgPopup.querySelector('.popup__caption').textContent = cardData.name;
@@ -41,7 +46,7 @@ function handleProfileEditForm(evt) {
     evt.preventDefault();
     profileTitle.textContent = nameInput.value;
     profileDesc.textContent = jobInput.value;
-    closeModal();
+    closeModal(profileEditPopup);
 }
 
 // Обработка формы добавления карточки
@@ -53,7 +58,7 @@ function handleAddCardForm(evt) {
         }, removeCard, likeCard, showImage);
     cardsListNode.prepend(card);
     evt.target.reset();
-    closeModal();
+    closeModal(addCardPopup);
 }
 
 // Вывести карточки на страницу
@@ -77,3 +82,18 @@ addCardButton.addEventListener('click', () => {
 
 profileEditForm.addEventListener('submit', handleProfileEditForm);
 addCardForm.addEventListener('submit', handleAddCardForm);
+
+popups.forEach((item) => {
+    
+    item.addEventListener('click', (evt) => {
+        if (evt.target.classList.contains('popup')) {
+            closeModal(item);
+        }
+    });
+
+    item.querySelector('.popup__close').addEventListener('click', () => {
+        closeModal(item);
+    });
+
+    console.log();
+});
