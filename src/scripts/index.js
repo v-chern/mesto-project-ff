@@ -1,5 +1,3 @@
-//@todo: refactor code to modules
-
 import '../pages/index.css';
 import { initialCards } from '../components/cards';
 import { openModal, closeModal } from '../components/modal';
