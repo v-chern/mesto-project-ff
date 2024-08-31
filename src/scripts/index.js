@@ -27,6 +27,7 @@ const cardLinkInput = addCardForm.querySelector('.popup__input_type_url');
 //img popup
 const showImgPopup = document.querySelector('.popup_type_image');
 const popupImgElem = showImgPopup.querySelector('.popup__image');
+const popupImgCap = showImgPopup.querySelector('.popup__caption');
 
 //popups collection
 const popups = document.querySelectorAll('.popup');
@@ -35,7 +36,7 @@ const popups = document.querySelectorAll('.popup');
 function showImage(cardData) {
     popupImgElem.src = cardData.link;
     popupImgElem.alt = 'Детальное изображение места' + cardData.name;
-    showImgPopup.querySelector('.popup__caption').textContent = cardData.name;
+    popupImgCap.textContent = cardData.name;
     openModal(showImgPopup);
 }
 
