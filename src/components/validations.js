@@ -1,17 +1,23 @@
 function showValidationError (inputElement, errorElement, errorMessage) {
     inputElement.classList.add('popup__input-error');
     errorElement.textContent = errorMessage;
-    errorElement.classList.add('popup__input-error-text_active');
+    errorElement.classList.add('popup__error_visible');
 }
 
 function hideValidationError (inputElement, errorElement) {
     inputElement.classList.remove('popup__input-error');
     errorElement.textContent = '';
-    errorElement.classList.remove('popup__input-error-text_active');
+    errorElement.classList.remove('popup__error_visible');
 }
 
 function checkInputValidity (inputElement, errorElement) {
     if (!inputElement.validity.valid) {
+        if (inputElement.validity.patternMismatch) {
+            inputElement.setCustomValidity(inputElement.dataset.errorMessage);
+        }
+        else {
+            inputElement.setCustomValidity('');
+        }
         showValidationError(inputElement, errorElement, inputElement.validationMessage);
     } else {
         hideValidationError(inputElement, errorElement);
@@ -25,7 +31,7 @@ function hasInvalidInput(inputList) {
 }
 
 function toggleButtonState(inputList, buttonElement) {
-    const inactiveClass = 'popup__button-inactive';
+    const inactiveClass = 'popup__button_disabled';
     if (hasInvalidInput(inputList)) {
         buttonElement.classList.add(inactiveClass);
     } else {
@@ -33,4 +39,4 @@ function toggleButtonState(inputList, buttonElement) {
     }
 }
 
-export {checkInputValidity};
+export { checkInputValidity, toggleButtonState };
