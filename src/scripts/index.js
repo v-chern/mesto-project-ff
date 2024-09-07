@@ -2,10 +2,20 @@ import '../pages/index.css';
 import { initialCards } from '../components/cards';
 import { openModal, closeModal } from '../components/modal';
 import { createCard, removeCard, likeCard } from '../components/card';
-import { checkInputValidity, toggleButtonState } from '../components/validations';
+import { enableValidation, clearValidation } from '../components/validation';
 
 // Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
+
+// Настройки валидации
+const validationConfig = {
+    formSelector: '.popup__form',
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled',
+    inputErrorClass: 'popup__input_type_error',
+    errorVisibilityClass: 'popup__error_visible'
+};
 
 // DOM узлы
 const cardsListNode = document.querySelector('.places__list');
@@ -15,19 +25,15 @@ const profileDesc = document.querySelector('.profile__description');
 const profileEditButton = document.querySelector('.profile__edit-button');
 const profileEditPopup = document.querySelector('.popup_type_edit');
 const profileEditForm = profileEditPopup.querySelector('.popup__form');
-const profileEditInputsArr = Array.from(profileEditForm.querySelectorAll('.popup__input'));
 const nameInput = profileEditForm.querySelector('.popup__input_type_name');
 const jobInput = profileEditForm.querySelector('.popup__input_type_description');
-const profileSaveButton = profileEditForm.querySelector('.popup__button');
 
 //add card nodes
 const addCardButton = document.querySelector('.profile__add-button');
 const addCardPopup = document.querySelector('.popup_type_new-card');
 const addCardForm = addCardPopup.querySelector('.popup__form');
-const addCardInputsArr = Array.from(addCardForm.querySelectorAll('.popup__input'));
 const cardNameInput = addCardForm.querySelector('.popup__input_type_card-name');
 const cardLinkInput = addCardForm.querySelector('.popup__input_type_url');
-const addCardSaveButton = addCardForm.querySelector('.popup__button');
 
 //img popup
 const showImgPopup = document.querySelector('.popup_type_image');
@@ -65,44 +71,18 @@ function handleAddCardForm(evt) {
     closeModal(addCardPopup);
 }
 
-// Разовая валидация формы
-function validateForm(form, formInputs, formButton) {
-    formInputs.forEach((inputElement) => {
-        const errorElement = form.querySelector(`.${inputElement.id}-error`);
-        toggleButtonState(formInputs, formButton);
-        checkInputValidity(inputElement, errorElement);
-    });
-}
-
-// Активация валидации для формы
-function enableInputValidation(form, formInputs, formButton) {
-    toggleButtonState(formInputs, formButton);
-    formInputs.forEach((inputElement) => {
-        const errorElement = form.querySelector(`.${inputElement.id}-error`);
-        inputElement.addEventListener('input', () => {
-            toggleButtonState(formInputs, formButton);
-            checkInputValidity(inputElement, errorElement);
-        });
-    });
-}
-
-// todo: refactor validation functinality
-
-enableInputValidation(profileEditForm, profileEditInputsArr, profileSaveButton);
-enableInputValidation(addCardForm, addCardInputsArr, addCardSaveButton);
-
 //Добавление листенеров
 profileEditButton.addEventListener('click', () => {
     nameInput.value = profileTitle.textContent;
     jobInput.value = profileDesc.textContent;
-    validateForm(profileEditForm, profileEditInputsArr, profileSaveButton)
+    clearValidation(profileEditForm, validationConfig);
     openModal(profileEditPopup);
 });
 
 addCardButton.addEventListener('click', () => {
     cardNameInput.value = '';
     cardLinkInput.value = '';
-    validateForm(addCardForm, addCardInputsArr, addCardSaveButton);
+    clearValidation(addCardForm, validationConfig);
     openModal(addCardPopup);
 })
 
@@ -123,7 +103,9 @@ popups.forEach((item) => {
     console.log();
 });
 
-// Вывести карточки на страницу
+// Активация валидации
+enableValidation(validationConfig); 
+
 // Создание и вывод карточек на страницу
 initialCards.forEach((item) => {
     const card = createCard(cardTemplate, item, removeCard, likeCard, showImage);
