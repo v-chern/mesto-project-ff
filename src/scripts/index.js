@@ -2,6 +2,7 @@ import '../pages/index.css';
 import { initialCards } from '../components/cards';
 import { openModal, closeModal } from '../components/modal';
 import { createCard, removeCard, likeCard } from '../components/card';
+import { checkInputValidity } from '../components/validations';
 
 // Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
@@ -14,8 +15,11 @@ const profileDesc = document.querySelector('.profile__description');
 const profileEditButton = document.querySelector('.profile__edit-button');
 const profileEditPopup = document.querySelector('.popup_type_edit');
 const profileEditForm = profileEditPopup.querySelector('.popup__form');
+const profileInputs = profileEditForm.querySelectorAll('.popup__input');
 const nameInput = profileEditForm.querySelector('.popup__input_type_name');
 const jobInput = profileEditForm.querySelector('.popup__input_type_description');
+const nameInputError = profileEditForm.querySelector(`.${nameInput.id}-error`);
+const jobInputError = profileEditForm.querySelector(`.${jobInput.id}-error`);
 
 //add card nodes
 const addCardButton = document.querySelector('.profile__add-button');
@@ -66,6 +70,7 @@ initialCards.forEach((item) => {
     const card = createCard(cardTemplate, item, removeCard, likeCard, showImage);
     cardsListNode.append(card);
 });
+
 
 profileEditButton.addEventListener('click', () => {
     nameInput.value = profileTitle.textContent;
