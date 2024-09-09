@@ -3,6 +3,7 @@ import { initialCards } from '../components/cards';
 import { openModal, closeModal } from '../components/modal';
 import { createCard, removeCard, likeCard } from '../components/card';
 import { enableValidation, clearValidation } from '../components/validation';
+import { getUserDetails, getCards } from '../components/api';
 
 // Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
@@ -16,6 +17,23 @@ const validationConfig = {
     inputErrorClass: 'popup__input_type_error',
     errorVisibilityClass: 'popup__error_visible'
 };
+
+// Настройки подключения к серверу
+const serverConfig = {
+    baseUrl: 'https://nomoreparties.co/v1/wff-cohort-22',
+    headers: {
+        authorization: '',
+        'Content-Type': 'application/json'
+    }
+}
+
+getCards(serverConfig)
+    .then((result) => {
+    console.log(result);
+    })
+    .catch((err) => {
+        console.log(err); // выводим ошибку в консоль
+    }); 
 
 // DOM узлы
 const cardsListNode = document.querySelector('.places__list');
