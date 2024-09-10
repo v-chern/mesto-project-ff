@@ -1,12 +1,8 @@
 import '../pages/index.css';
-import { initialCards } from '../components/cards';
 import { openModal, closeModal } from '../components/modal';
-import { createCard, removeCard, likeCard } from '../components/card';
+import { createCard } from '../components/card';
 import { enableValidation, clearValidation } from '../components/validation';
-import { getUserDetails, getCards } from '../components/api';
-
-// Темплейт карточки
-const cardTemplate = document.querySelector('#card-template').content;
+import { getUserDetails, updateUserDetails, getCards, addNewCard, deleteCard, addLike, removeLike } from '../components/api';
 
 // Настройки валидации
 const validationConfig = {
@@ -22,24 +18,26 @@ const validationConfig = {
 const serverConfig = {
     baseUrl: 'https://nomoreparties.co/v1/wff-cohort-22',
     headers: {
-        authorization: '',
+        authorization: '68a7de7a-4657-4ffc-8eeb-1ef94cb920e6',
         'Content-Type': 'application/json'
     }
 }
 
-getCards(serverConfig)
-    .then((result) => {
-    console.log(result);
-    })
-    .catch((err) => {
-        console.log(err); // выводим ошибку в консоль
-    }); 
+// Активный пользователь
+let currentUser = null;
+
+// Массив карточек
+let initialCards = null;
+
+// Темплейт карточки
+const cardTemplate = document.querySelector('#card-template').content;
 
 // DOM узлы
 const cardsListNode = document.querySelector('.places__list');
 //profile edit popup nodes
 const profileTitle = document.querySelector('.profile__title');
 const profileDesc = document.querySelector('.profile__description');
+const profileImg = document.querySelector('.profile__image');
 const profileEditButton = document.querySelector('.profile__edit-button');
 const profileEditPopup = document.querySelector('.popup_type_edit');
 const profileEditForm = profileEditPopup.querySelector('.popup__form');
@@ -61,6 +59,14 @@ const popupImgCap = showImgPopup.querySelector('.popup__caption');
 //popups collection
 const popups = document.querySelectorAll('.popup');
 
+// Функции
+
+const cardFunctions = {
+    "deleteCard": deleteCard,
+    "likeCard": addLike,
+    "dislikeCard": removeLike
+}
+
 // Обработка клика по изображению
 function showImage(cardData) {
     popupImgElem.src = cardData.link;
@@ -69,24 +75,54 @@ function showImage(cardData) {
     openModal(showImgPopup);
 }
 
+// Отображение данных пользователя
+function showUserDetails(user) {
+    profileTitle.textContent = user.name;
+    profileDesc.textContent = user.about;
+    profileImg.src = user.avatar;
+}
+
+// Отображение карточек
+function showCards(cardsArray, currentUser) {
+    cardsArray.forEach((item) => {
+        const card = createCard(serverConfig, currentUser._id, 
+            cardTemplate, item, cardFunctions, showImage);
+        cardsListNode.append(card);
+    });
+}
+
 // Обработка формы редактирования профиля
 function handleProfileEditForm(evt) {
     evt.preventDefault();
-    profileTitle.textContent = nameInput.value;
-    profileDesc.textContent = jobInput.value;
-    closeModal(profileEditPopup);
+    updateUserDetails(serverConfig, {
+        name: nameInput.value,
+        about: jobInput.value
+    })
+        .then((res) => {
+            console.log(res);
+            profileTitle.textContent = userDetails.name;
+            profileDesc.textContent = userDetails.about;
+            closeModal(profileEditPopup);
+        })
+        .catch((err) => {
+            console.log(`Ошибка обновления данных пользователя: ${err}`);
+        });
 }
 
 // Обработка формы добавления карточки
 function handleAddCardForm(evt) {
     evt.preventDefault();
-    const card = createCard(cardTemplate, {
-            name: cardNameInput.value,
-            link: cardLinkInput.value
-        }, removeCard, likeCard, showImage);
-    cardsListNode.prepend(card);
-    evt.target.reset();
-    closeModal(addCardPopup);
+    addNewCard(serverConfig, {
+        name: cardNameInput.value,
+        link: cardLinkInput.value
+    })
+        .then((res) => {
+            console.log(res);
+            const card = createCard(serverConfig, currentUser._id, cardTemplate, res, cardFunctions, showImage);
+            cardsListNode.prepend(card);
+            evt.target.reset();
+            closeModal(addCardPopup);
+        })
 }
 
 //Добавление листенеров
@@ -117,15 +153,19 @@ popups.forEach((item) => {
     item.querySelector('.popup__close').addEventListener('click', () => {
         closeModal(item);
     });
-
-    console.log();
 });
 
 // Активация валидации
 enableValidation(validationConfig); 
 
-// Создание и вывод карточек на страницу
-initialCards.forEach((item) => {
-    const card = createCard(cardTemplate, item, removeCard, likeCard, showImage);
-    cardsListNode.append(card);
-});
+// Загрузка начальных данных
+Promise.all([getUserDetails(serverConfig), getCards(serverConfig)])
+    .then((res) => {
+        currentUser = res[0];
+        initialCards = Array.from(res[1]);
+        showUserDetails(currentUser);
+        showCards(initialCards, currentUser);
+    })
+    .catch((err) => {
+          console.log(`Ошибка загрузки данных: ${err}`);
+    }); 

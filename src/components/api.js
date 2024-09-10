@@ -12,6 +12,20 @@ function getFromServer(url, headers) {
         })
 }
 
+function postOnServer(url, headers, data) {
+    return fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(data)
+    })    
+        .then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            return Promise.reject(`Ошибка: ${res.status}`);
+        })
+}
+
 function patchOnServer(url, headers, data) {
     return fetch(url, {
         method: 'PATCH',
@@ -26,11 +40,10 @@ function patchOnServer(url, headers, data) {
         })
 }
 
-function putOnServer(url, headers, data) {
+function putOnServer(url, headers) {
     return fetch(url, {
         method: 'PUT',
-        headers,
-        body: JSON.stringify(data)
+        headers
     })
         .then(res => {
             if (res.ok) {
@@ -43,7 +56,7 @@ function putOnServer(url, headers, data) {
 function deleteFromServer(url, headers) {
     return fetch(url, {
         method: 'DELETE',
-        headers,
+        headers
     })
         .then(res => {
             if (res.ok) {
@@ -53,14 +66,47 @@ function deleteFromServer(url, headers) {
         })
 }
 
-function getUserDetails (config) {
-    const url = config.baseUrl + '/users/me'
+function getUserDetails(config) {
+    const url = config.baseUrl + '/users/me';
     return getFromServer(url, config.headers);
 }
+
+function updateUserDetails(config, userDetails) {
+    const url = config.baseUrl + '/users/me';
+    return patchOnServer(url, config.headers, userDetails);
+} 
 
 function getCards (config) {
-    const url = config.baseUrl + '/cards'
+    const url = config.baseUrl + '/cards';
     return getFromServer(url, config.headers);
 }
 
-export { getUserDetails, getCards };
+function addNewCard(config, cardData) {
+    const url = config.baseUrl + '/cards';
+    return postOnServer(url, config.headers, cardData);
+}
+
+function deleteCard(config, cardId) {
+    const url = config.baseUrl + '/cards/' + cardId;
+    return deleteFromServer(url, config.headers)
+}
+
+function addLike(config, cardId) {
+    const url = config.baseUrl + '/cards/likes/' + cardId;
+    return putOnServer(url, config.headers)
+}
+
+function removeLike(config, cardId) {
+    const url = config.baseUrl + '/cards/likes/' + cardId;
+    return deleteFromServer(url, config.headers)
+}
+
+export { 
+    getUserDetails, 
+    updateUserDetails, 
+    getCards, 
+    addNewCard, 
+    deleteCard,
+    addLike,
+    removeLike
+};
