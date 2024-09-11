@@ -13,7 +13,7 @@
     <img src="<%=require('./images/logo.svg')%>" alt="Логотип проекта масто" class="logo header__logo">
   </header>
   <main class="content">
-    <section class="profile page__section">
+    < class="profile page__section">
       <img class="profile__image" src="<%=require('./images/avatar.jpg')%>" alt="Аватар пользователя">
       <div class="profile__info">
         <h1 class="profile__title">Жак-Ив Кусто</h1>
@@ -95,6 +95,26 @@
             required
           />
           <span class="popup__input-error_text card-url-input-error card-url-input-error_active"></span>
+        </div>
+        <button type="submit" class="button popup__button">Сохранить</button>
+      </form>
+    </div>
+  </div>
+  <div class="popup popup_is-animated popup_type_avatar">
+    <div class="popup__content">
+      <button type="button" class="popup__close"></button>
+      <h3 class="popup__title">Обновить аватар</h3>
+      <form class="popup__form" name="avatar">
+        <div class="popup__input-container">
+          <input 
+            id = "avatar-url-input"
+            type="url" 
+            name="link" 
+            class="popup__input popup__input_type_url" 
+            placeholder="Ссылка на аватар" 
+            required
+          />
+          <span class="popup__input-error_text avatar-url-input-error avatar-url-input_active"></span>
         </div>
         <button type="submit" class="button popup__button">Сохранить</button>
       </form>

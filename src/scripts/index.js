@@ -99,9 +99,8 @@ function handleProfileEditForm(evt) {
         about: jobInput.value
     })
         .then((res) => {
-            console.log(res);
-            profileTitle.textContent = userDetails.name;
-            profileDesc.textContent = userDetails.about;
+            profileTitle.textContent = res.name;
+            profileDesc.textContent = res.about;
             closeModal(profileEditPopup);
         })
         .catch((err) => {
@@ -117,7 +116,6 @@ function handleAddCardForm(evt) {
         link: cardLinkInput.value
     })
         .then((res) => {
-            console.log(res);
             const card = createCard(serverConfig, currentUser._id, cardTemplate, res, cardFunctions, showImage);
             cardsListNode.prepend(card);
             evt.target.reset();
