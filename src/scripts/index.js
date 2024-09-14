@@ -1,8 +1,9 @@
 import '../pages/index.css';
 import { openModal, closeModal } from '../components/modal';
-import { createCard } from '../components/card';
+import { createCard, deleteCard } from '../components/card';
 import { enableValidation, clearValidation } from '../components/validation';
 import { userDetailsAPI, cardsAPI } from '../components/api';
+import { showSavingInProgress } from '../components/utils';
 
 // Настройки валидации
 const validationConfig = {
@@ -83,8 +84,8 @@ function showImage(cardData) {
     openModal(showImgPopup);
 }
 
-// Обработка клика по удалению карточки
-function removeCard(cardElement, cardId) {
+// Сохранение карточки для удаления
+function saveCardForRemoval(cardElement, cardId) {
     currentCard.element = cardElement;
     currentCard.id = cardId;
     openModal(deleteCardPopup);
@@ -101,18 +102,9 @@ function showUserDetails(user) {
 function showCards(cardsArray, currentUser) {
     cardsArray.forEach((item) => {
         const card = createCard(serverConfig, currentUser._id, 
-            cardTemplate, item, cardsAPI, showImage, removeCard);
+            cardTemplate, item, cardsAPI, showImage, saveCardForRemoval);
         cardsListNode.append(card);
     });
-}
-
-function showSavingInProgress(formElement, isSaving) {
-    const formButton = formElement.querySelector('.popup__button');
-    if (isSaving) {
-        formButton.textContent = 'Сохранение...'
-    } else {
-        formButton.textContent = 'Сохранить'
-    }
 }
 
 // Обработка формы редактирования профиля
@@ -145,6 +137,8 @@ function handleChangeAvatarForm(evt) {
     })
         .then((res) => {
             profileImg.src = res.avatar;
+            avatarUrlInput.value = '';
+            clearValidation(avatarEditForm, validationConfig);
             closeModal(avatarEditPopup);
         })
         .catch((err) => {
@@ -165,9 +159,12 @@ function handleAddCardForm(evt) {
     })
         .then((res) => {
             const card = createCard(serverConfig, currentUser._id, 
-                cardTemplate, res, cardsAPI, showImage, removeCard);
+                cardTemplate, res, cardsAPI, showImage, saveCardForRemoval);
             cardsListNode.prepend(card);
             evt.target.reset();
+            cardNameInput.value = '';
+            cardLinkInput.value = '';
+            clearValidation(addCardForm, validationConfig);
             closeModal(addCardPopup);
         })
         .catch((err) => {
@@ -181,16 +178,9 @@ function handleAddCardForm(evt) {
 // Обработка удаления карточки
 function handleCardRemoval(evt) {
     evt.preventDefault();
-    cardsAPI.deleteCard(serverConfig, currentCard.id)
-        .then((res) => {
-            currentCard.element.remove();
-            currentCard.element = null;
-            currentCard.id = null;
-            closeModal(deleteCardPopup);
-        })
-        .catch((err) => {
-            console.log(`Ошибка удаления карточки ${err}`);
-        })
+    if (currentCard.element !== null && currentCard.id !== null) {
+        deleteCard(serverConfig, cardsAPI, currentCard, deleteCardPopup, closeModal);
+    }
 }
 
 //Добавление листенеров
@@ -202,15 +192,10 @@ profileEditButton.addEventListener('click', () => {
 });
 
 avatarEditButton.addEventListener('click', () => {
-    avatarUrlInput.value = '';
-    clearValidation(avatarEditForm, validationConfig);
     openModal(avatarEditPopup);
 });
 
 addCardButton.addEventListener('click', () => {
-    cardNameInput.value = '';
-    cardLinkInput.value = '';
-    clearValidation(addCardForm, validationConfig);
     openModal(addCardPopup);
 })
 

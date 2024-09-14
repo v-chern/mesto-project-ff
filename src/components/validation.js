@@ -6,6 +6,7 @@ function showValidationError(valConfig, inputElement, errorElement, errorMessage
 
 function hideValidationError(valConfig, inputElement, errorElement) {
     inputElement.classList.remove(valConfig.inputErrorClass);
+    inputElement.setCustomValidity("");
     errorElement.textContent = '';
     errorElement.classList.remove(valConfig.errorVisibilityClass);
 }

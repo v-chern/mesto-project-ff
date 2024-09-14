@@ -14,7 +14,7 @@ function createCard(connConfig, userId,
                     cardTemplate, cardData, 
                     cardsAPI,
                     showImageFunc,
-                    removeCardFunc) {
+                    cardForRemovalFunc) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     const cardImgElement = cardElement.querySelector('.card__image');
     const likesCntElement = cardElement.querySelector('.card__like-counter');
@@ -29,7 +29,7 @@ function createCard(connConfig, userId,
     cardElement.querySelector('.card__title').textContent = cardData.name;
     if (cardData.owner._id === userId) {
         cardDeleteButton.addEventListener('click', () => {
-            removeCardFunc(cardElement, cardData._id);
+            cardForRemovalFunc(cardElement, cardData._id);
         });
     } else {
         cardDeleteButton.classList.add('card__delete-button_inactive');
@@ -41,6 +41,20 @@ function createCard(connConfig, userId,
         showImageFunc(cardData);
     });
     return cardElement;
+}
+
+// Удаление карточки
+function deleteCard(connConfig, cardsAPI, cardObj, deleteCardElem, closeModalFunc) {
+    cardsAPI.deleteCard(connConfig, cardObj.id)
+        .then((res) => {
+            cardObj.element.remove();
+            cardObj.element = null;
+            cardObj.id = null;
+            closeModalFunc(deleteCardElem);
+        })
+        .catch((err) => {
+            console.log(`Ошибка удаления карточки ${err}`);
+        })
 }
 
 // Функция лайка карточки
@@ -67,4 +81,4 @@ function handleCardLike(connConfig, cardsAPI, cardLikeButton, likesCntElem, card
     }
 }
 
-export {createCard};
+export { createCard, deleteCard };
