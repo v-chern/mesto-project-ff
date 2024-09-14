@@ -2,7 +2,7 @@ import '../pages/index.css';
 import { openModal, closeModal } from '../components/modal';
 import { createCard } from '../components/card';
 import { enableValidation, clearValidation } from '../components/validation';
-import { getUserDetails, updateUserDetails, getCards, addNewCard, deleteCard, addLike, removeLike } from '../components/api';
+import { userDetailsAPI, cardsAPI } from '../components/api';
 
 // Настройки валидации
 const validationConfig = {
@@ -44,6 +44,12 @@ const profileEditForm = profileEditPopup.querySelector('.popup__form');
 const nameInput = profileEditForm.querySelector('.popup__input_type_name');
 const jobInput = profileEditForm.querySelector('.popup__input_type_description');
 
+//avatar edit nodes
+const avatarEditButton = document.querySelector('.profile__image_edit-button');
+const avatarEditPopup = document.querySelector('.popup_type_avatar');
+const avatarEditForm = avatarEditPopup.querySelector('.popup__form');
+const avatarUrlInput = avatarEditPopup.querySelector('.popup__input_type_url');
+
 //add card nodes
 const addCardButton = document.querySelector('.profile__add-button');
 const addCardPopup = document.querySelector('.popup_type_new-card');
@@ -61,10 +67,11 @@ const popups = document.querySelectorAll('.popup');
 
 // Функции
 
+//todo: change to cardsAPI
 const cardFunctions = {
-    "deleteCard": deleteCard,
-    "likeCard": addLike,
-    "dislikeCard": removeLike
+    "deleteCard": cardsAPI.deleteCard,
+    "likeCard": cardsAPI.addLike,
+    "dislikeCard": cardsAPI.removeLike
 }
 
 // Обработка клика по изображению
@@ -94,7 +101,7 @@ function showCards(cardsArray, currentUser) {
 // Обработка формы редактирования профиля
 function handleProfileEditForm(evt) {
     evt.preventDefault();
-    updateUserDetails(serverConfig, {
+    userDetailsAPI.updateUserDetails(serverConfig, {
         name: nameInput.value,
         about: jobInput.value
     })
@@ -108,10 +115,25 @@ function handleProfileEditForm(evt) {
         });
 }
 
+// Обработка формы обновления аватара
+function handleChangeAvatarForm(evt) {
+    evt.preventDefault();
+    userDetailsAPI.updateUserAvatar(serverConfig, {
+        avatar: avatarUrlInput.value
+    })
+        .then((res) => {
+            profileImg.src = res.avatar;
+            closeModal(avatarEditPopup);
+        })
+        .catch((err) => {
+            console.log(`Ошибка обновления аватара: ${err}`);
+        });
+}
+
 // Обработка формы добавления карточки
 function handleAddCardForm(evt) {
     evt.preventDefault();
-    addNewCard(serverConfig, {
+    cardsAPI.addNewCard(serverConfig, {
         name: cardNameInput.value,
         link: cardLinkInput.value
     })
@@ -131,6 +153,12 @@ profileEditButton.addEventListener('click', () => {
     openModal(profileEditPopup);
 });
 
+avatarEditButton.addEventListener('click', () => {
+    avatarUrlInput.value = '';
+    clearValidation(avatarEditForm, validationConfig);
+    openModal(avatarEditPopup);
+});
+
 addCardButton.addEventListener('click', () => {
     cardNameInput.value = '';
     cardLinkInput.value = '';
@@ -139,6 +167,7 @@ addCardButton.addEventListener('click', () => {
 })
 
 profileEditForm.addEventListener('submit', handleProfileEditForm);
+avatarEditPopup.addEventListener('submit', handleChangeAvatarForm);
 addCardForm.addEventListener('submit', handleAddCardForm);
 
 popups.forEach((item) => {
@@ -157,7 +186,7 @@ popups.forEach((item) => {
 enableValidation(validationConfig); 
 
 // Загрузка начальных данных
-Promise.all([getUserDetails(serverConfig), getCards(serverConfig)])
+Promise.all([userDetailsAPI.getUserDetails(serverConfig), cardsAPI.getCards(serverConfig)])
     .then((res) => {
         currentUser = res[0];
         initialCards = Array.from(res[1]);
