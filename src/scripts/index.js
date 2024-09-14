@@ -57,6 +57,14 @@ const addCardForm = addCardPopup.querySelector('.popup__form');
 const cardNameInput = addCardForm.querySelector('.popup__input_type_card-name');
 const cardLinkInput = addCardForm.querySelector('.popup__input_type_url');
 
+//
+const deleteCardPopup = document.querySelector('.popup_type_delete-card');
+const deleteCardForm = deleteCardPopup.querySelector('.popup__form');
+const currentCard = {
+    element: null,
+    id: null
+}
+
 //img popup
 const showImgPopup = document.querySelector('.popup_type_image');
 const popupImgElem = showImgPopup.querySelector('.popup__image');
@@ -67,19 +75,19 @@ const popups = document.querySelectorAll('.popup');
 
 // Функции
 
-//todo: change to cardsAPI
-const cardFunctions = {
-    "deleteCard": cardsAPI.deleteCard,
-    "likeCard": cardsAPI.addLike,
-    "dislikeCard": cardsAPI.removeLike
-}
-
 // Обработка клика по изображению
 function showImage(cardData) {
     popupImgElem.src = cardData.link;
     popupImgElem.alt = 'Детальное изображение места' + cardData.name;
     popupImgCap.textContent = cardData.name;
     openModal(showImgPopup);
+}
+
+// Обработка клика по удалению карточки
+function removeCard(cardElement, cardId) {
+    currentCard.element = cardElement;
+    currentCard.id = cardId;
+    openModal(deleteCardPopup);
 }
 
 // Отображение данных пользователя
@@ -93,14 +101,24 @@ function showUserDetails(user) {
 function showCards(cardsArray, currentUser) {
     cardsArray.forEach((item) => {
         const card = createCard(serverConfig, currentUser._id, 
-            cardTemplate, item, cardFunctions, showImage);
+            cardTemplate, item, cardsAPI, showImage, removeCard);
         cardsListNode.append(card);
     });
+}
+
+function showSavingInProgress(formElement, isSaving) {
+    const formButton = formElement.querySelector('.popup__button');
+    if (isSaving) {
+        formButton.textContent = 'Сохранение...'
+    } else {
+        formButton.textContent = 'Сохранить'
+    }
 }
 
 // Обработка формы редактирования профиля
 function handleProfileEditForm(evt) {
     evt.preventDefault();
+    showSavingInProgress(profileEditForm, true);
     userDetailsAPI.updateUserDetails(serverConfig, {
         name: nameInput.value,
         about: jobInput.value
@@ -112,12 +130,16 @@ function handleProfileEditForm(evt) {
         })
         .catch((err) => {
             console.log(`Ошибка обновления данных пользователя: ${err}`);
+        })
+        .finally(() => {
+            showSavingInProgress(profileEditForm, false);
         });
 }
 
 // Обработка формы обновления аватара
 function handleChangeAvatarForm(evt) {
     evt.preventDefault();
+    showSavingInProgress(avatarEditForm, true);
     userDetailsAPI.updateUserAvatar(serverConfig, {
         avatar: avatarUrlInput.value
     })
@@ -127,21 +149,47 @@ function handleChangeAvatarForm(evt) {
         })
         .catch((err) => {
             console.log(`Ошибка обновления аватара: ${err}`);
+        })
+        .finally(() => {
+            showSavingInProgress(avatarEditForm, false);
         });
 }
 
 // Обработка формы добавления карточки
 function handleAddCardForm(evt) {
     evt.preventDefault();
+    showSavingInProgress(addCardForm, true);
     cardsAPI.addNewCard(serverConfig, {
         name: cardNameInput.value,
         link: cardLinkInput.value
     })
         .then((res) => {
-            const card = createCard(serverConfig, currentUser._id, cardTemplate, res, cardFunctions, showImage);
+            const card = createCard(serverConfig, currentUser._id, 
+                cardTemplate, res, cardsAPI, showImage, removeCard);
             cardsListNode.prepend(card);
             evt.target.reset();
             closeModal(addCardPopup);
+        })
+        .catch((err) => {
+            console.log(`Ошибка добавления карточки: ${err}`);
+        })
+        .finally(() => {
+            showSavingInProgress(addCardForm, false);
+        }); 
+}
+
+// Обработка удаления карточки
+function handleCardRemoval(evt) {
+    evt.preventDefault();
+    cardsAPI.deleteCard(serverConfig, currentCard.id)
+        .then((res) => {
+            currentCard.element.remove();
+            currentCard.element = null;
+            currentCard.id = null;
+            closeModal(deleteCardPopup);
+        })
+        .catch((err) => {
+            console.log(`Ошибка удаления карточки ${err}`);
         })
 }
 
@@ -166,9 +214,11 @@ addCardButton.addEventListener('click', () => {
     openModal(addCardPopup);
 })
 
+
 profileEditForm.addEventListener('submit', handleProfileEditForm);
-avatarEditPopup.addEventListener('submit', handleChangeAvatarForm);
+avatarEditForm.addEventListener('submit', handleChangeAvatarForm);
 addCardForm.addEventListener('submit', handleAddCardForm);
+deleteCardForm.addEventListener('submit', handleCardRemoval);
 
 popups.forEach((item) => {
     item.addEventListener('click', (evt) => {
@@ -176,7 +226,6 @@ popups.forEach((item) => {
             closeModal(item);
         }
     });
-
     item.querySelector('.popup__close').addEventListener('click', () => {
         closeModal(item);
     });

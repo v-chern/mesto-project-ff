@@ -110,37 +110,7 @@ const cardsAPI = {
     }
 }
 
-function getCards (config) {
-    const url = config.baseUrl + '/cards';
-    return getFromServer(url, config.headers);
-}
-
-function addNewCard(config, cardData) {
-    const url = config.baseUrl + '/cards';
-    return postOnServer(url, config.headers, cardData);
-}
-
-function deleteCard(config, cardId) {
-    const url = config.baseUrl + '/cards/' + cardId;
-    return deleteFromServer(url, config.headers)
-}
-
-function addLike(config, cardId) {
-    const url = config.baseUrl + '/cards/likes/' + cardId;
-    return putOnServer(url, config.headers)
-}
-
-function removeLike(config, cardId) {
-    const url = config.baseUrl + '/cards/likes/' + cardId;
-    return deleteFromServer(url, config.headers)
-}
-
 export { 
     userDetailsAPI,
-    cardsAPI,
-    getCards, 
-    addNewCard, 
-    deleteCard,
-    addLike,
-    removeLike
+    cardsAPI
 };
