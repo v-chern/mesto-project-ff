@@ -1,3 +1,14 @@
+// Проверка, что карточка лайкнута пользователем
+function isCardLikedByUser(userId, cardLikes) {
+    let retVal = false;
+    cardLikes.forEach((item) => {
+        if (item._id === userId) {
+            retVal = true;
+        }
+    });
+    return retVal;
+}
+
 // Функция создания карточки
 function createCard(connConfig, userId, 
                     cardTemplate, cardData, 
@@ -12,6 +23,9 @@ function createCard(connConfig, userId,
     cardImgElement.src = cardData.link;
     cardImgElement.alt = 'Изображение, отражающее красоту места ' + cardData.name;
     likesCntElement.textContent = cardData.likes.length;
+    if (isCardLikedByUser(userId, cardData.likes, cardData)) {
+        cardLikeButton.classList.add('card__like-button_is-active');
+    }
     cardElement.querySelector('.card__title').textContent = cardData.name;
     if (cardData.owner._id === userId) {
         cardDeleteButton.addEventListener('click', () => {
@@ -50,9 +64,7 @@ function handleCardLike(connConfig, cardsAPI, cardLikeButton, likesCntElem, card
         .catch((err) => {
             console.log(`Ошибка лайка карточки ${err}`);
         })
-        cardLikeButton.classList.add('card__like-button_is-active');
     }
-    
 }
 
 export {createCard};
