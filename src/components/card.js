@@ -9,13 +9,17 @@ function isCardLikedByUser(userId, cardLikes) {
     return retVal;
 }
 
+function getCardElement(cardTemplate) {
+ return cardTemplate.querySelector('.card').cloneNode(true);
+}
+
 // Функция создания карточки
 function createCard(connConfig, userId, 
                     cardTemplate, cardData, 
                     cardsAPI,
                     showImageFunc,
                     cardForRemovalFunc) {
-    const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
+    const cardElement = getCardElement(cardTemplate)
     const cardImgElement = cardElement.querySelector('.card__image');
     const likesCntElement = cardElement.querySelector('.card__like-counter');
     const cardDeleteButton = cardElement.querySelector('.card__delete-button');

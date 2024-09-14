@@ -1,15 +1,18 @@
+function validateResponse(res) {
+    if (res.ok) {
+        return res.json();
+    }
+    return Promise.reject(`Ошибка: ${res.status}`);
+}
+
 function getFromServer(url, headers) {
     return fetch(url, {
         headers: {
           authorization: headers.authorization
         }
-    })
-        .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
+    }).then(res => { 
+        return validateResponse(res);
+      })
 }
 
 function postOnServer(url, headers, data) {
@@ -17,13 +20,9 @@ function postOnServer(url, headers, data) {
         method: 'POST',
         headers,
         body: JSON.stringify(data)
-    })    
-        .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
+    }).then(res => { 
+        return validateResponse(res);
+      })
 }
 
 function patchOnServer(url, headers, data) {
@@ -31,39 +30,27 @@ function patchOnServer(url, headers, data) {
         method: 'PATCH',
         headers,
         body: JSON.stringify(data)
-    })    
-        .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
+    }).then(res => { 
+        return validateResponse(res);
+      })
 }
 
 function putOnServer(url, headers) {
     return fetch(url, {
         method: 'PUT',
         headers
-    })
-        .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
+    }).then(res => { 
+        return validateResponse(res);
+      })
 }
 
 function deleteFromServer(url, headers) {
     return fetch(url, {
         method: 'DELETE',
         headers
-    })
-        .then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-            return Promise.reject(`Ошибка: ${res.status}`);
-        })
+    }).then(res => { 
+        return validateResponse(res);
+      })
 }
 
 const userDetailsAPI = {
